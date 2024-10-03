@@ -1,7 +1,8 @@
-import logo from "./logo.svg";
+
 import "./App.css";
 import { click } from "@testing-library/user-event/dist/click";
-import { useState } from "react";
+import { useDebugValue, useState } from "react";
+import { current } from "@reduxjs/toolkit";
 
 function Spuared({ value, setSpuared }) {
   return (
@@ -11,48 +12,21 @@ function Spuared({ value, setSpuared }) {
   );
 }
 
-export default function Broad() {
-  const [arrSquares, setArrSquares] = useState(Array(9).fill(null));
-  const [XTurn, setXTurn] = useState(true);
-  // const [title, setTitle] = useState("the curent turn is : X ");
-  // const [title, setTitle] = useState(
-  //   "the curent turn is :  " + (XTurn ? "X" : "0")
-  // );
-  // let title = "the curent turn is :  " + (XTurn ? "X" : "0");
+function Broad({ XTurn, arrSquares, setSquares }) {
+  // const [arrSquares, setArrSquares] = useState(Array(9).fill(null));
+  // const [XTurn, setXTurn] = useState(true);
 
   const winner = checkForWinner(arrSquares);
   let status = "Next player: " + checkForWinner(arrSquares);
-  status = XTurn ? "X" : "O"; 
-  // if (winner) {
-  //   status = "Winner: " + winner;
-  // } else {
-  //   status = "Next player: " + (XTurn ? "X" : "O");
-  // }
-  function setSquares(i) {
-    let newArrSpuared = [...arrSquares];
-    if (newArrSpuared[i] || checkForWinner(arrSquares)) {
-      return;
-    }
-    if (XTurn) {
-      newArrSpuared[i] = "X";
-      setXTurn(false);
-    } else {
-      newArrSpuared[i] = "0";
-      setXTurn(true);
-    }
-    setArrSquares(newArrSpuared);
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    status = "Next player: " + (XTurn ? "X" : "O");
   }
 
   return (
     <>
-      <h1>
-        {/* {winner
-          ? "Winner: " + winner
-          : XTurn
-          ? "It's X's turn"
-          : "It's O's turn"} */}
-        {status}
-      </h1>
+      <h1>{status}</h1>
       <div className="board-row">
         <Spuared
           value={arrSquares[0]}
@@ -99,6 +73,61 @@ export default function Broad() {
   );
 }
 
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  // const [XTurn, setXTurn] = useState(true);
+  const [gameMove, setMove] = useState(history.length - 1);
+  const XTurn = gameMove % 2 == 0;
+  const currentSquares = history[gameMove];
+  function setSquares(i) {
+    let newArrSpuared = [...currentSquares];
+    if (newArrSpuared[i] || checkForWinner(currentSquares)) {
+      return;
+    }
+    if (XTurn) {
+      newArrSpuared[i] = "X";
+    } else {
+      newArrSpuared[i] = "0";
+    }
+    const currentHistory = [...history.slice(0, gameMove + 1), newArrSpuared];
+    setHistory(currentHistory);
+    setMove(currentHistory.length - 1);
+    // SetCurrentSquares(newArrSpuared);
+  }
+  function jumpTo(nextMove) {
+    setMove(nextMove);
+    // setXTurn(nextMove % 2 === 0);
+  }
+  const moves = history.map((Spuare, move) => {
+    let description;
+    if (move > 0) {
+      description = "we are at the " + move + " move";
+    } else {
+      description = "reset game move ";
+    }
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}> {description} </button>
+      </li>
+    );
+  });
+  return (
+    <div className="broad-container">
+      <div>
+        {" "}
+        <Broad
+          XTurn={XTurn}
+          arrSquares={currentSquares}
+          setSquares={setSquares}
+        ></Broad>
+      </div>{" "}
+      <div>
+        <ol>{moves}</ol>
+      </div>
+    </div>
+  );
+}
+
 function checkForWinner(arrSquares) {
   const winningCombinations = [
     [0, 1, 2], // First row
@@ -122,3 +151,7 @@ function checkForWinner(arrSquares) {
   }
   return false;
 }
+// Spuared Component: Renders a button representing a square in the game.
+// Broad Component: Renders the game board and handles the display of the game status.
+// Game Component: Manages the game state, history, and rendering of the board and move list.
+// checkForWinner Function: Determines if there is a winner based on the current state of the board.

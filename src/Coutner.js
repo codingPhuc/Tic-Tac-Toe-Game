@@ -1,7 +1,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { click } from "@testing-library/user-event/dist/click";
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from "@reduxjs/toolkit";
 import { useState, createContext, useContext } from "react";
 const ContextCount = createContext();
 function ComponentB() {

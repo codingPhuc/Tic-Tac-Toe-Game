@@ -18,3 +18,15 @@
   content: '';
   display: table;
 }
+.broad-container {
+  display: flex;
+  justify-content: space-between;
+  /* Optional: Adjust spacing between items */
+}
+
+.broad-container>div {
+  flex: 1;
+  /* Optional: Adjust the width of each child */
+  margin: 0 10px;
+  /* Optional: Add margin between items */
+}
